@@ -17,10 +17,17 @@ def sent_analyzer():
         score for the provided text.
     '''
     text_to_analyze = request.args.get('textToAnalyze')
-    sentiment_label_score: dict = sentiment_analyzer(text_to_analyze)
-    formatted_sentiment_label_score: str = f"The given text has been identified as {sentiment_label_score['label']} with a score of {sentiment_label_score['score']}." 
-    return formatted_sentiment_label_score
-    
+    if text_to_analyze.strip() == "":
+        return "input text is required. Try again."
+
+    sentiment: dict | None = sentiment_analyzer(text_to_analyze)
+    if sentiment is None:
+        return "Invalid input! Try again."
+
+    formatted_sentiment: str = f"""The given text has been identified as {sentiment['label']}
+                              with a score of {sentiment['score']}."""
+    return formatted_sentiment
+
 @app.route("/")
 def render_index_page():
     ''' This function initiates the rendering of the main application
@@ -29,6 +36,4 @@ def render_index_page():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    ''' This functions executes the flask app and deploys it on localhost:5000
-    '''
     app.run(host="0.0.0.0", port=5000)
